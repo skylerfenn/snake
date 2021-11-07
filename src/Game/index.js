@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Cell, Container, GameOver, Row } from './styled';
-import { getNextFoodPoint, getNextPoint, hasNextPoint, mapPoints, useInterval } from './helpers';
+import { getNextFoodPoint, getNextFoodPoints, getNextPoint, hasNextPoint, mapPoints, useInterval } from './helpers';
 import { DOWN, LEFT, RIGHT, UP, SIZE } from './constants';
 
 const initialSnakePoints = [
   [0, 0],
   [0, 1],
-  [0, 2],
 ];
 
 const Game = () => {
@@ -15,6 +14,8 @@ const Game = () => {
   const [foodPoints, setFoodPoints] = useState([getNextFoodPoint(snakePoints)]);
   const [gameOver, setGameOver] = useState(false);
   const [paused, setPaused] = useState(false);
+
+  const score = snakePoints.length - initialSnakePoints.length;
 
   const togglePaused = useCallback(() => setPaused(!paused), [paused]);
 
@@ -65,8 +66,12 @@ const Game = () => {
 
     if (ateFood) {
       nextFoodPoints = nextFoodPoints.filter((foodPoint) => !hasNextPoint(foodPoint, nextSnakePoint)); // remove ate food
-      const nextFoodPoint = getNextFoodPoint(nextSnakePoints, nextFoodPoints); // make next food
-      setFoodPoints([...nextFoodPoints, nextFoodPoint]); // add next food
+      const newFoodPoints = getNextFoodPoints(
+        nextSnakePoints,
+        nextFoodPoints,
+        Math.min(1 + ([10, 20].includes(score) ? 1 : 0), 3)
+      ); // make next food
+      setFoodPoints([...nextFoodPoints, ...newFoodPoints]); // add next food
     } else {
       // if next point is NOT food, don't remove
       nextSnakePoints.shift();
@@ -74,7 +79,7 @@ const Game = () => {
 
     setSnakePoints([...nextSnakePoints, nextSnakePoint]);
 
-  }, [snakePoints, setSnakePoints, foodPoints, setFoodPoints]);
+  }, [score, snakePoints, setSnakePoints, foodPoints, setFoodPoints]);
 
   const tick = useCallback(() => {
     if (gameOver || paused) {
@@ -103,8 +108,6 @@ const Game = () => {
 
     handleMove(nextPoint);
   }, [setGameOver, paused, gameOver, direction, handleMove, snakePoints]);
-
-  const score = snakePoints.length - initialSnakePoints.length;
 
   let delay = 300 - (50 * Math.floor(score / 10));
 

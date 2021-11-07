@@ -58,6 +58,14 @@ export const getNextFoodPoint = (snakePoints, foodPoints = []) => {
   return random(possiblePoints);
 }
 
+export const getNextFoodPoints = (snakePoints, foodPoints, count) => {
+  const nextFoodPoints = [...foodPoints];
+  for (let i = 0; i < count; i++) {
+    nextFoodPoints.push(getNextFoodPoint(snakePoints, nextFoodPoints));
+  }
+  return nextFoodPoints;
+};
+
 export const hasNextPoint = (point, nextPoint) => point[0] === nextPoint[0] && point[1] === nextPoint[1];
 
 export const mapPoints = (points) => {
