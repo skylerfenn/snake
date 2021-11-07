@@ -58,12 +58,10 @@ const Game = () => {
     };
   }, [paused, reset, togglePaused, gameOver, setDirection]);
 
-  const handleMove = useCallback((nextSnakePoint) => {
+  const handleMove = useCallback((nextSnakePoint, ateFood) => {
 
     const [...nextSnakePoints] = snakePoints;
     let [...nextFoodPoints] = foodPoints;
-
-    const ateFood = foodPoints.some((foodPoint) => hasNextPoint(foodPoint, nextSnakePoint));
 
     if (ateFood) {
       nextFoodPoints = nextFoodPoints.filter((foodPoint) => !hasNextPoint(foodPoint, nextSnakePoint)); // remove ate food
@@ -74,7 +72,7 @@ const Game = () => {
       ); // make next food
       setFoodPoints([...nextFoodPoints, ...newFoodPoints]); // add next food
     } else {
-      // if next point is NOT food, don't remove
+      // if next point is NOT food, remove
       nextSnakePoints.shift();
     }
 
@@ -101,14 +99,16 @@ const Game = () => {
       return;
     }
 
-    // if nextPoint is in points, game over.
-    if (snakePoints.some((point => hasNextPoint(point, nextPoint)))) {
+    const ateFood = foodPoints.some((foodPoint) => hasNextPoint(foodPoint, nextPoint));
+
+    // if nextPoint is in points, unless it's the last when it didn't eat food, game over.
+    if (snakePoints.slice(ateFood ? 0 : 1, snakePoints.length - 1).some((point => hasNextPoint(point, nextPoint)))) {
       setGameOver(true);
       return;
     }
 
-    handleMove(nextPoint);
-  }, [setGameOver, paused, gameOver, direction, handleMove, snakePoints]);
+    handleMove(nextPoint, ateFood);
+  }, [setGameOver, paused, gameOver, direction, handleMove, foodPoints, snakePoints]);
 
   let delay = 300 - (50 * Math.floor(score / 10));
 
