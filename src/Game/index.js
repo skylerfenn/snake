@@ -29,6 +29,7 @@ const Game = () => {
 
   useEffect(() => {
     const listener = (e) => {
+      e.preventDefault();
       if ([' ', 'Enter'].includes(e.key)) {
         togglePaused();
         if (gameOver) {
