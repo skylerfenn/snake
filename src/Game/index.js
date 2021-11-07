@@ -68,7 +68,7 @@ const Game = () => {
       const nextFoodPoint = getNextFoodPoint(nextSnakePoints, nextFoodPoints); // make next food
       setFoodPoints([...nextFoodPoints, nextFoodPoint]); // add next food
     } else {
-      // if next point is food, don't remove
+      // if next point is NOT food, don't remove
       nextSnakePoints.shift();
     }
 
